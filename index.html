@@ -553,6 +553,41 @@
   }
   .judah-close:hover { background: rgba(26,58,107,0.25); }
 
+
+  /* ── THEORY / PRACTICE TOGGLE ── */
+  .section-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 5px;
+    box-shadow: var(--shadow);
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 9px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-muted);
+  }
+  .toggle-btn.active {
+    background: var(--navy);
+    color: white;
+    box-shadow: 0 2px 8px rgba(26,58,107,0.3);
+  }
+  .toggle-btn:not(.active):hover {
+    background: var(--green-pale);
+    color: var(--navy);
+  }
+  .theory-content, .practice-content { display: none; }
+  .theory-content.visible, .practice-content.visible { display: block; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -616,6 +651,11 @@
 
   <!-- ══════ SECTION 1: ECOSYSTEMS ══════ -->
   <div class="section active" id="s1">
+    <div class="section-toggle">
+      <button class="toggle-btn active" id="s1-theory-btn" onclick="toggleSection('s1','theory')">📖 Theory</button>
+      <button class="toggle-btn" id="s1-practice-btn" onclick="toggleSection('s1','practice')">✏️ Practice</button>
+    </div>
+    <div class="theory-content visible" id="s1-theory">
     <div class="verse-card">
       <div class="verse-label">📖 Biblical Principle — Indicator 1</div>
       <div class="verse-text">"Then the Lord God provided a gourd and made it grow up over Jonah to give shade over his head and to deliver him from his discomfort. And Jonah was very glad about the gourd."</div>
@@ -683,6 +723,8 @@
       </div>
     </div>
 
+    </div><!-- end theory s1 -->
+    <div class="practice-content" id="s1-practice">
     <!-- PRACTICE S1 -->
     <div class="practice-section">
       <h3>✏️ Practice Questions</h3>
@@ -756,10 +798,17 @@
         <div class="feedback-box" id="fb-s1-6"></div>
       </div>
     </div>
+    </div><!-- end practice-section -->
+    </div><!-- end practice s1 -->
   </div>
 
   <!-- ══════ SECTION 2: FOOD WEBS ══════ -->
   <div class="section" id="s2">
+    <div class="section-toggle">
+      <button class="toggle-btn active" id="s2-theory-btn" onclick="toggleSection('s2','theory')">📖 Theory</button>
+      <button class="toggle-btn" id="s2-practice-btn" onclick="toggleSection('s2','practice')">✏️ Practice</button>
+    </div>
+    <div class="theory-content visible" id="s2-theory">
     <div class="verse-card">
       <div class="verse-label">📖 Biblical Principle — Indicator 2</div>
       <div class="verse-text">"Then the Lord God provided a gourd and made it grow up over Jonah to give shade over his head and to deliver him from his discomfort."</div>
@@ -853,6 +902,8 @@
       <p style="margin-top:10px;">🌿 <em>This is why God's creation is designed with interdependence — every part matters. Just like the gourd mattered to Jonah, every organism matters in God's ecosystem.</em></p>
     </div>
 
+    </div><!-- end theory s2 -->
+    <div class="practice-content" id="s2-practice">
     <!-- PRACTICE S2 -->
     <div class="practice-section">
       <h3>✏️ Practice Questions</h3>
@@ -920,10 +971,17 @@
         <div class="feedback-box" id="fb-s2-6"></div>
       </div>
     </div>
+    </div><!-- end practice-section -->
+    </div><!-- end practice s2 -->
   </div>
 
   <!-- ══════ SECTION 3: FAST FASHION ══════ -->
   <div class="section" id="s3">
+    <div class="section-toggle">
+      <button class="toggle-btn active" id="s3-theory-btn" onclick="toggleSection('s3','theory')">📖 Theory</button>
+      <button class="toggle-btn" id="s3-practice-btn" onclick="toggleSection('s3','practice')">✏️ Practice</button>
+    </div>
+    <div class="theory-content visible" id="s3-theory">
     <div class="verse-card">
       <div class="verse-label">📖 Biblical Principle — Indicator 3</div>
       <div class="verse-text">"For the land you are about to possess is not like the land of Egypt... But the land you are about to possess is a land of mountains and valleys, watered by rain from heaven. It is a land the Lord your God cares for, from the beginning of the year to the end of the year."</div>
@@ -988,6 +1046,8 @@
       </div>
     </div>
 
+    </div><!-- end theory s3 -->
+    <div class="practice-content" id="s3-practice">
     <!-- PRACTICE S3 -->
     <div class="practice-section">
       <h3>✏️ Practice Questions</h3>
@@ -1055,6 +1115,8 @@
         <div class="feedback-box" id="fb-s3-6"></div>
       </div>
     </div>
+    </div><!-- end practice-section -->
+    </div><!-- end practice s3 -->
   </div>
 
   <!-- ══════ SECTION 4: WORKSHOP ══════ -->
@@ -1695,6 +1757,26 @@ async function submitWorkshop() {
 
 function closeModal() {
   document.getElementById('result-modal').classList.remove('show');
+}
+
+function toggleSection(sec, tab) {
+  const theory   = document.getElementById(sec + '-theory');
+  const practice = document.getElementById(sec + '-practice');
+  const theoryBtn   = document.getElementById(sec + '-theory-btn');
+  const practiceBtn = document.getElementById(sec + '-practice-btn');
+
+  if (tab === 'theory') {
+    theory.classList.add('visible');
+    practice.classList.remove('visible');
+    theoryBtn.classList.add('active');
+    practiceBtn.classList.remove('active');
+  } else {
+    practice.classList.add('visible');
+    theory.classList.remove('visible');
+    practiceBtn.classList.add('active');
+    theoryBtn.classList.remove('active');
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 </script>
 </body>
