@@ -554,6 +554,7 @@
   .judah-close:hover { background: rgba(26,58,107,0.25); }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1420,8 +1421,8 @@ async function submitWorkshop() {
   }
 
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = 'Sending… ⏳';
-  document.getElementById('submit-status').textContent = 'Grading and sending to teacher...';
+  btn.disabled = true; btn.textContent = 'Grading… ⏳';
+  document.getElementById('submit-status').textContent = 'Grading your workshop...';
 
   // Grade MC/TF
   let mcScore = 0;
@@ -1430,26 +1431,199 @@ async function submitWorkshop() {
     const given = workshopAnswers[qid] || '—';
     const isOk = given === correct;
     if (isOk) mcScore++;
-    details.push(`Q${qid.replace('wq','')} [${isOk?'✅':'❌'}] Given: ${given} | Correct: ${correct}`);
+    details.push({ q: qid.replace('wq',''), given, correct, ok: isOk });
   }
 
-  const total = 6; // MC/TF questions
-  const pct = Math.round((mcScore/total)*100);
-
-  let emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '📚' : '💪';
-
+  const total = 6;
+  const pct = Math.round((mcScore / total) * 100);
   const now = new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'});
-  const msg =
+  const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '📚' : '💪';
+
+  btn.textContent = 'Generating PDF… 📄';
+  document.getElementById('submit-status').textContent = 'Building your PDF result...';
+
+  // ── Generate PDF with jsPDF ──
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, PL = 18, PR = 192, LH = 7;
+  let y = 0;
+
+  function addPage() { doc.addPage(); y = 20; }
+  function checkY(need = 12) { if (y + need > 275) addPage(); }
+
+  // Header bar
+  doc.setFillColor(26, 58, 107);
+  doc.rect(0, 0, W, 32, 'F');
+  doc.setFillColor(192, 57, 43);
+  doc.rect(0, 32, W, 4, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18); doc.setFont('helvetica','bold');
+  doc.text('7th Grade Science Workshop', W/2, 13, {align:'center'});
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Colegio Boston Flexible · 1st Period 2026', W/2, 21, {align:'center'});
+  doc.text('Año de la Pureza · Great Disciples', W/2, 28, {align:'center'});
+
+  y = 44;
+
+  // Student info box
+  doc.setFillColor(221, 232, 247);
+  doc.roundedRect(PL, y, PR - PL, 28, 3, 3, 'F');
+  doc.setTextColor(26, 58, 107);
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.text('Student Information', PL + 4, y + 7);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.setTextColor(30, 30, 60);
+  doc.text(`Name: ${currentStudent.name}`, PL + 4, y + 14);
+  doc.text(`Email: ${currentStudent.email}`, PL + 4, y + 20);
+  doc.text(`Date: ${now}`, PL + 4, y + 26);
+  y += 34;
+
+  // Score box
+  const scoreColor = pct >= 70 ? [39, 174, 96] : pct >= 50 ? [211, 84, 0] : [192, 57, 43];
+  doc.setFillColor(...scoreColor);
+  doc.roundedRect(PL, y, PR - PL, 22, 3, 3, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(14); doc.setFont('helvetica','bold');
+  doc.text(`SCORE: ${mcScore} / ${total}   (${pct}%)`, W/2, y + 9, {align:'center'});
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  const verdict = pct >= 90 ? 'Outstanding!' : pct >= 70 ? 'Good job!' : pct >= 50 ? 'Keep studying!' : 'Needs improvement';
+  doc.text(verdict, W/2, y + 17, {align:'center'});
+  y += 30;
+
+  // Section divider helper
+  function sectionTitle(title, color=[26,58,107]) {
+    checkY(14);
+    doc.setFillColor(...color);
+    doc.rect(PL, y, PR-PL, 8, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(title, PL+3, y+5.5);
+    y += 11;
+    doc.setTextColor(30,30,60);
+  }
+
+  // MC/TF Results
+  sectionTitle('PART 1 — Multiple Choice & True/False Results');
+
+  const qLabels = {
+    '1': 'Q1 · Ecosystems — Abiotic/Biotic pair',
+    '2': 'Q2 · Ecosystems — Biome vs Ecosystem',
+    '3': 'Q3 · Food Webs — Trophic Level',
+    '4': 'Q4 · Food Webs — Top Predator removal',
+    '5': 'Q5 · Fast Fashion — Aquatic impact',
+    '6': 'Q6 · Stewardship — Upcycling'
+  };
+
+  details.forEach(d => {
+    checkY(16);
+    // Row bg
+    doc.setFillColor(d.ok ? 234 : 253, d.ok ? 250 : 240, d.ok ? 241 : 240);
+    doc.roundedRect(PL, y, PR-PL, 13, 2, 2, 'F');
+    // Status circle
+    doc.setFillColor(d.ok ? 39 : 192, d.ok ? 174 : 57, d.ok ? 96 : 43);
+    doc.circle(PL+6, y+6.5, 4, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(d.ok ? '✓' : '✗', PL+4.5, y+7.3);
+    // Question label
+    doc.setTextColor(30,30,60);
+    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(qLabels[d.q] || `Question ${d.q}`, PL+13, y+5.5);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.text(`Your answer: ${d.given}   |   Correct: ${d.correct}`, PL+13, y+10.5);
+    y += 16;
+  });
+
+  y += 4;
+
+  // Open Questions
+  sectionTitle('PART 2 — Open Questions');
+
+  // Q7
+  checkY(20);
+  doc.setFillColor(240, 244, 255);
+  doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.setTextColor(26,58,107);
+  doc.text('Q7 — Food Web Analysis:', PL, y+6);
+  doc.setFontSize(8.5); doc.setFont('helvetica','italic');
+  doc.setTextColor(80,80,100);
+  doc.text('Grass → Grasshopper → Frog → Snake → Hawk — if frogs disappear, describe 2 effects.', PL, y+12);
+  y += 16;
+
+  doc.setFillColor(248,250,255);
+  doc.setDrawColor(26,58,107);
+  doc.setLineWidth(0.3);
+  const q7lines = doc.splitTextToSize(q7 || '(No answer provided)', PR-PL-6);
+  const q7h = Math.max(20, q7lines.length * LH + 8);
+  checkY(q7h + 4);
+  doc.roundedRect(PL, y, PR-PL, q7h, 2, 2, 'FD');
+  doc.setTextColor(30,30,60); doc.setFontSize(9.5); doc.setFont('helvetica','normal');
+  doc.text(q7lines, PL+3, y+6);
+  y += q7h + 8;
+
+  // Q8
+  checkY(20);
+  doc.setFillColor(240, 244, 255);
+  doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.setTextColor(26,58,107);
+  doc.text('Q8 — Biblical Reflection:', PL, y+6);
+  doc.setFontSize(8.5); doc.setFont('helvetica','italic');
+  doc.setTextColor(80,80,100);
+  doc.text('Based on Jonah 4:6 & Deuteronomy 11:10-11 — our responsibility toward God's creation.', PL, y+12);
+  y += 16;
+
+  doc.setFillColor(248,250,255);
+  doc.setDrawColor(26,58,107);
+  const q8lines = doc.splitTextToSize(q8 || '(No answer provided)', PR-PL-6);
+  const q8h = Math.max(20, q8lines.length * LH + 8);
+  checkY(q8h + 4);
+  doc.roundedRect(PL, y, PR-PL, q8h, 2, 2, 'FD');
+  doc.setTextColor(30,30,60); doc.setFontSize(9.5); doc.setFont('helvetica','normal');
+  doc.text(q8lines, PL+3, y+6);
+  y += q8h + 10;
+
+  // Footer on last page
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(26,58,107);
+    doc.rect(0, 285, W, 12, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.text('Colegio Boston Flexible · 7th Grade Science · 1st Period 2026', PL, 292);
+    doc.text(`Page ${i} of ${pageCount}`, PR, 292, {align:'right'});
+  }
+
+  // ── Get PDF as blob and send to Telegram ──
+  const pdfBlob = doc.output('blob');
+  const fileName = `Workshop_${currentStudent.name.replace(/\s+/g,'_')}_Science7.pdf`;
+
+  btn.textContent = 'Sending to Telegram… 📨';
+  document.getElementById('submit-status').textContent = 'Sending PDF to your teacher...';
+
+  // Send text notification first
+  const textMsg =
     `📝 <b>WORKSHOP SUBMITTED — 7th Grade Science</b>\n` +
     `👤 <b>${currentStudent.name}</b>\n` +
     `📧 ${currentStudent.email}\n` +
-    `🕐 ${now}\n\n` +
-    `<b>📊 SCORE: ${mcScore}/${total} (${pct}%)</b>\n\n` +
-    `<b>MC / T-F Results:</b>\n${details.join('\n')}\n\n` +
-    `<b>Q7 — Food Web Analysis:</b>\n${q7}\n\n` +
-    `<b>Q8 — Biblical Reflection:</b>\n${q8}`;
+    `🕐 ${now}\n` +
+    `<b>📊 SCORE: ${mcScore}/${total} (${pct}%) ${emoji}</b>\n` +
+    `See attached PDF for full answers.`;
+  await sendTelegram(textMsg);
 
-  await sendTelegram(msg);
+  // Send PDF as document
+  try {
+    const formData = new FormData();
+    formData.append('chat_id', CHAT_ID);
+    formData.append('document', pdfBlob, fileName);
+    formData.append('caption', `📄 ${currentStudent.name} — Science Workshop (${pct}%)`);
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+      method: 'POST',
+      body: formData
+    });
+  } catch(e) { console.warn('PDF send error', e); }
 
   // Show modal
   document.getElementById('modal-emoji').textContent = emoji;
@@ -1457,8 +1631,8 @@ async function submitWorkshop() {
   document.getElementById('modal-score').textContent = `${mcScore}/${total} — ${pct}%`;
   document.getElementById('modal-msg').textContent =
     pct >= 70
-      ? 'Great work! Your teacher has received your results. God bless your studies. 🌿'
-      : 'Your answers have been sent to your teacher. Keep reviewing — you can do it! 💪';
+      ? 'Great work! Your teacher received your PDF results. God bless your studies! 🌿'
+      : 'Your PDF has been sent to your teacher. Keep studying — you can do it! 💪';
   document.getElementById('result-modal').classList.add('show');
 }
 
