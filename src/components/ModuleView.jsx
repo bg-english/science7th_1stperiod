@@ -23,10 +23,12 @@ export default function ModuleView({ module }) {
         ))}
       </div>
 
-      {tab === 'theory'
-        ? <TheoryPanel module={module} />
-        : <PracticePanel questions={module.practice} moduleId={module.id} />
-      }
+      <div style={{ display: tab === 'theory' ? '' : 'none' }}>
+        <TheoryPanel module={module} />
+      </div>
+      <div style={{ display: tab === 'practice' ? '' : 'none' }}>
+        <PracticePanel questions={module.practice} moduleId={module.id} />
+      </div>
     </div>
   )
 }

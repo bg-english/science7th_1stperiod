@@ -116,39 +116,31 @@ export default function PracticePanel({ questions, moduleId }) {
         ))}
       </div>
 
-      {activity === 'questions' && (
-        <>
-          {total > 0 && (
-            <div className="flex justify-between items-center rounded-xl px-4 py-3 mb-4 text-sm font-bold"
-              style={{ background: '#dde8f7', color: '#1a3a6b' }}>
-              <span>Score:</span><span>{score} / {total} answered</span>
-            </div>
-          )}
-          <h3 className="font-black text-base mb-4">✏️ Practice Questions</h3>
-          {questions.map(q => <QuestionCard key={q.id} q={q} answered={answered} onAnswer={handleAnswer} />)}
-        </>
-      )}
+      <div style={{ display: activity === 'questions' ? '' : 'none' }}>
+        {total > 0 && (
+          <div className="flex justify-between items-center rounded-xl px-4 py-3 mb-4 text-sm font-bold"
+            style={{ background: '#dde8f7', color: '#1a3a6b' }}>
+            <span>Score:</span><span>{score} / {total} answered</span>
+          </div>
+        )}
+        <h3 className="font-black text-base mb-4">✏️ Practice Questions</h3>
+        {questions.map(q => <QuestionCard key={q.id} q={q} answered={answered} onAnswer={handleAnswer} />)}
+      </div>
 
-      {activity === 'match' && (
-        <>
-          <p className="text-xs text-gray-400 mb-3">Tap a term on the left, then its matching definition on the right.</p>
-          <MatchGame key={moduleId+'-match'} pairs={MATCH_DATA[moduleId] || []} />
-        </>
-      )}
+      <div style={{ display: activity === 'match' ? '' : 'none' }}>
+        <p className="text-xs text-gray-400 mb-3">Tap a term on the left, then its matching definition on the right.</p>
+        <MatchGame pairs={MATCH_DATA[moduleId] || []} />
+      </div>
 
-      {activity === 'wordsearch' && (
-        <>
-          <p className="text-xs text-gray-400 mb-3">Find all hidden words. Drag across the grid to select.</p>
-          <WordSearch key={moduleId+'-ws'} words={WORDSEARCH_DATA[moduleId] || []} />
-        </>
-      )}
+      <div style={{ display: activity === 'wordsearch' ? '' : 'none' }}>
+        <p className="text-xs text-gray-400 mb-3">Find all hidden words. Drag across the grid to select.</p>
+        <WordSearch words={WORDSEARCH_DATA[moduleId] || []} />
+      </div>
 
-      {activity === 'crossword' && (
-        <>
-          <p className="text-xs text-gray-400 mb-3">Tap a clue or cell to start typing. Press Check when done.</p>
-          <Crossword key={moduleId+'-cw'} clues={CROSSWORD_DATA[moduleId] || []} />
-        </>
-      )}
+      <div style={{ display: activity === 'crossword' ? '' : 'none' }}>
+        <p className="text-xs text-gray-400 mb-3">Tap a clue or cell to start typing. Press Check when done.</p>
+        <Crossword clues={CROSSWORD_DATA[moduleId] || []} />
+      </div>
     </div>
   )
 }
