@@ -55,17 +55,24 @@ export default function Workshop({ student }) {
   const setOpen      = (id, val) => setAnswers(p => ({ ...p, [id]: val }))
 
   const handleSubmit = async () => {
-    const mcAnswered  = mcTf.every(q => answers[q.id] !== undefined)
+    const mcAnswered   = mcTf.every(q => answers[q.id] !== undefined)
     const openAnswered = open.every(q => (answers[q.id] || '').trim().length >= 20)
-    const gamesPlayed = matchScore.current.total > 0 && wsScore.current.total > 0 && cwScore.current.total > 0
+    const gamesPlayed  = matchScore.current.total > 0 && wsScore.current.total > 0 && cwScore.current.total > 0
 
-    if (!mcAnswered || !openAnswered) {
-      setStatus('⚠️ Please complete Q&A and Open sections before submitting.')
-      return
-    }
-    if (!gamesPlayed) {
-      setStatus('⚠️ Please also complete the Match, Word Search, and Crossword sections.')
-      return
+    const incomplete = []
+    if (!mcAnswered)   incomplete.push('Q&A questions')
+    if (!gamesPlayed)  incomplete.push('Match / Word Search / Crossword')
+    if (!openAnswered) incomplete.push('Open questions')
+
+    if (incomplete.length > 0) {
+      const confirmed = window.confirm(
+        `⚠️ You have not completed: ${incomplete.join(', ')}.
+
+Your teacher will see which sections were left empty.
+
+Do you still want to submit?`
+      )
+      if (!confirmed) return
     }
 
     setLoading(true); setStatus('Grading your workshop...')
