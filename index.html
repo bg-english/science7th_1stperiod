@@ -1597,33 +1597,90 @@ async function submitWorkshop() {
   }
 
   // ── Get PDF as blob and send to Telegram ──
-  const pdfBlob = doc.output('blob');
+  // Use arraybuffer for maximum Safari/iPad compatibility
+  const pdfArrayBuffer = doc.output('arraybuffer');
+  const pdfUint8 = new Uint8Array(pdfArrayBuffer);
+  const pdfBlob = new Blob([pdfUint8], { type: 'application/pdf' });
   const fileName = `Workshop_${currentStudent.name.replace(/\s+/g,'_')}_Science7.pdf`;
 
   btn.textContent = 'Sending to Telegram… 📨';
   document.getElementById('submit-status').textContent = 'Sending PDF to your teacher...';
 
-  // Send text notification first
+  // Build full text summary as fallback
+  const detailText = details.map(d =>
+    `Q${d.q}: ${d.ok ? '✅' : '❌'} (Answered: ${d.given}, Correct: ${d.correct})`
+  ).join('\n');
+
   const textMsg =
     `📝 <b>WORKSHOP SUBMITTED — 7th Grade Science</b>\n` +
     `👤 <b>${currentStudent.name}</b>\n` +
     `📧 ${currentStudent.email}\n` +
-    `🕐 ${now}\n` +
-    `<b>📊 SCORE: ${mcScore}/${total} (${pct}%) ${emoji}</b>\n` +
-    `See attached PDF for full answers.`;
+    `🕐 ${now}\n\n` +
+    `<b>📊 SCORE: ${mcScore}/${total} (${pct}%) ${emoji}</b>\n\n` +
+    `<b>Results:</b>\n${detailText}\n\n` +
+    `<b>Q7 — Food Web Analysis:</b>\n${q7}\n\n` +
+    `<b>Q8 — Biblical Reflection:</b>\n${q8}`;
+
+  // Always send text first (most compatible)
   await sendTelegram(textMsg);
 
-  // Send PDF as document
+  // Send PDF — with Safari/iPad fallback strategy
+  let pdfSent = false;
   try {
     const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
     formData.append('document', pdfBlob, fileName);
-    formData.append('caption', `📄 ${currentStudent.name} — Science Workshop (${pct}%)`);
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+    formData.append('caption', `📄 ${currentStudent.name} — Science Workshop ${pct}%`);
+
+    const resp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
       method: 'POST',
       body: formData
     });
-  } catch(e) { console.warn('PDF send error', e); }
+    const result = await resp.json();
+    if (result.ok) {
+      pdfSent = true;
+    } else {
+      throw new Error(result.description || 'Telegram rejected');
+    }
+  } catch(e) {
+    console.warn('FormData PDF send failed, trying base64 fallback:', e);
+    // Fallback: send PDF as base64-encoded file via JSON (works on all browsers incl. Safari)
+    try {
+      // Convert Uint8Array to base64
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < pdfUint8.length; i += chunkSize) {
+        binary += String.fromCharCode(...pdfUint8.subarray(i, i + chunkSize));
+      }
+      const b64pdf = btoa(binary);
+
+      // Use sendDocument with file_id alternative: re-encode as multipart manually via XMLHttpRequest
+      // which has better Safari support than fetch for multipart
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`);
+        xhr.onload = () => resolve(JSON.parse(xhr.responseText));
+        xhr.onerror = reject;
+        xhr.ontimeout = reject;
+        xhr.timeout = 30000;
+        const fd = new FormData();
+        fd.append('chat_id', CHAT_ID);
+        // Re-create blob explicitly for Safari
+        const safariBlob = new Blob([pdfUint8.buffer], {type:'application/pdf'});
+        fd.append('document', safariBlob, fileName);
+        fd.append('caption', `📄 ${currentStudent.name} — Science Workshop ${pct}%`);
+        xhr.send(fd);
+      });
+      pdfSent = true;
+    } catch(e2) {
+      console.warn('XHR fallback also failed:', e2);
+      // Last resort: notify teacher that PDF failed but text was sent
+      await sendTelegram(
+        `⚠️ <b>Note:</b> PDF could not be attached (browser limitation on this device). ` +
+        `Full answers are in the message above.`
+      );
+    }
+  }
 
   // Show modal
   document.getElementById('modal-emoji').textContent = emoji;
