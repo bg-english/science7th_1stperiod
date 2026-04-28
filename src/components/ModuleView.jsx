@@ -25,7 +25,7 @@ export default function ModuleView({ module }) {
 
       {tab === 'theory'
         ? <TheoryPanel module={module} />
-        : <PracticePanel questions={module.practice} />
+        : <PracticePanel questions={module.practice} moduleId={module.id} />
       }
     </div>
   )

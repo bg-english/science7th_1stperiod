@@ -222,3 +222,88 @@ export const JUDAH_MESSAGES = {
   s3:     "👕 Fast Fashion impacts God's creation. Let's be good stewards together! 🌿",
   s4:     "📝 Final Workshop! You've studied hard. Trust God and do your best. I believe in you! 🏆",
 }
+
+// ─── GAME DATA ───────────────────────────────────────────────────────────────
+
+export const MATCH_DATA = {
+  s1: [
+    { term: 'Ecosystem',   def: 'Community of organisms + environment' },
+    { term: 'Producer',    def: 'Makes own food via photosynthesis' },
+    { term: 'Decomposer',  def: 'Breaks down dead matter' },
+    { term: 'Abiotic',     def: 'Non-living factor (sunlight, water)' },
+    { term: 'Niche',       def: 'Role an organism plays in ecosystem' },
+    { term: 'Biodiversity',def: 'Variety of species in an area' },
+  ],
+  s2: [
+    { term: 'Food Web',      def: 'All interconnected food chains' },
+    { term: 'Herbivore',     def: 'Eats only plants' },
+    { term: 'Carnivore',     def: 'Eats only animals' },
+    { term: 'Omnivore',      def: 'Eats both plants and animals' },
+    { term: 'Pollinator',    def: 'Transfers pollen between flowers' },
+    { term: 'Energy Pyramid',def: '90% energy lost at each trophic level' },
+  ],
+  s3: [
+    { term: 'Fast Fashion',    def: 'Rapid cheap mass clothing production' },
+    { term: 'Microplastics',   def: 'Tiny plastic particles from synthetic fabric' },
+    { term: 'Stewardship',     def: 'Responsible care of God\'s creation' },
+    { term: 'Upcycling',       def: 'Transforming old items into new value' },
+    { term: 'Sustainable',     def: 'Meets needs without harming future generations' },
+    { term: 'Carbon Emissions',def: 'CO₂ released by industrial production' },
+  ],
+}
+
+export const WORDSEARCH_DATA = {
+  s1: ['ECOSYSTEM','HABITAT','PRODUCER','CONSUMER','BIOME','NICHE','ABIOTIC','BIOTIC','POPULATION','COMMUNITY'],
+  s2: ['FOODWEB','HERBIVORE','CARNIVORE','OMNIVORE','PREDATOR','PREY','POLLINATOR','TROPHIC','CASCADE','DECOMPOSER'],
+  s3: ['FASHION','MICROPLASTIC','STEWARDSHIP','UPCYCLING','SUSTAINABLE','POLLUTION','CHEMICAL','TEXTILE','CARBON','LANDFILL'],
+}
+
+export const CROSSWORD_DATA = {
+  s1: [
+    { id:'c1', number:1, answer:'ECOSYSTEM',   dir:'across', row:0, col:0, clue:'Community of organisms and their environment' },
+    { id:'c2', number:2, answer:'ENERGY',      dir:'down',   row:0, col:4, clue:'What flows through a food chain from the sun' },
+    { id:'c3', number:3, answer:'NICHE',       dir:'across', row:2, col:2, clue:'Role an organism plays in its ecosystem' },
+    { id:'c4', number:4, answer:'HABITAT',     dir:'down',   row:0, col:8, clue:'Place where an organism naturally lives' },
+    { id:'c5', number:5, answer:'BIOME',       dir:'across', row:4, col:1, clue:'Large region with similar climate and organisms' },
+    { id:'c6', number:6, answer:'PRODUCER',    dir:'down',   row:2, col:6, clue:'Organism that makes its own food' },
+  ],
+  s2: [
+    { id:'c1', number:1, answer:'FOODWEB',     dir:'across', row:0, col:0, clue:'Network of all food chains in an ecosystem' },
+    { id:'c2', number:2, answer:'OMNIVORE',    dir:'down',   row:0, col:3, clue:'Animal that eats both plants and animals' },
+    { id:'c3', number:3, answer:'PREDATOR',    dir:'across', row:3, col:0, clue:'Animal that hunts and eats other animals' },
+    { id:'c4', number:4, answer:'TROPHIC',     dir:'down',   row:0, col:7, clue:'___ level: position in a food chain' },
+    { id:'c5', number:5, answer:'CASCADE',     dir:'across', row:5, col:2, clue:'Effect when one species disappears and others are impacted' },
+  ],
+  s3: [
+    { id:'c1', number:1, answer:'FASHION',     dir:'across', row:0, col:0, clue:'Fast ___ industry: cheap trendy clothing' },
+    { id:'c2', number:2, answer:'STEWARD',     dir:'down',   row:0, col:3, clue:'A good ___ cares for God\'s creation' },
+    { id:'c3', number:3, answer:'UPCYCLE',     dir:'across', row:3, col:1, clue:'Transform old clothes into something valuable' },
+    { id:'c4', number:4, answer:'LANDFILL',    dir:'down',   row:0, col:6, clue:'Where 85% of textiles end up' },
+    { id:'c5', number:5, answer:'CARBON',      dir:'across', row:5, col:0, clue:'___ emissions: 10% comes from fashion industry' },
+    { id:'c6', number:6, answer:'POLLUTION',   dir:'down',   row:3, col:4, clue:'What chemical dyes cause in rivers' },
+  ],
+}
+
+// Workshop games (evaluated)
+export const WORKSHOP_MATCH = [
+  { term: 'Abiotic factor',   def: 'Sunlight, water, temperature, soil' },
+  { term: 'Biotic factor',    def: 'Plants, animals, fungi, bacteria' },
+  { term: 'Primary consumer', def: 'Organism that eats producers directly' },
+  { term: 'Cascade effect',   def: 'Chain reaction when one species is removed' },
+  { term: 'Stewardship',      def: 'God\'s call to care for His creation' },
+  { term: 'Microplastics',    def: 'Tiny particles from synthetic fabrics in waterways' },
+]
+
+export const WORKSHOP_WORDSEARCH = [
+  'PRODUCER','CONSUMER','ECOSYSTEM','TROPHIC','CASCADE',
+  'STEWARDSHIP','UPCYCLE','POLLUTION','BIODIVERSITY','HABITAT'
+]
+
+export const WORKSHOP_CROSSWORD = [
+  { id:'wc1', number:1, answer:'BIOTIC',       dir:'across', row:0, col:0, clue:'Living components of an ecosystem' },
+  { id:'wc2', number:2, answer:'OMNIVORE',     dir:'down',   row:0, col:2, clue:'Eats both plants and animals' },
+  { id:'wc3', number:3, answer:'TROPHIC',      dir:'across', row:3, col:0, clue:'___ level: position in food chain' },
+  { id:'wc4', number:4, answer:'CASCADE',      dir:'down',   row:0, col:6, clue:'Effect when a species disappears' },
+  { id:'wc5', number:5, answer:'STEWARD',      dir:'across', row:5, col:1, clue:'A good ___ cares for creation (Deut. 11)' },
+  { id:'wc6', number:6, answer:'LANDFILL',     dir:'down',   row:3, col:5, clue:'Destination for 85% of fast fashion waste' },
+]

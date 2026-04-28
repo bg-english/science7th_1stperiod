@@ -1,7 +1,7 @@
 // utils/generatePdf.js
 import { jsPDF } from 'jspdf'
 
-export function generateWorkshopPDF({ student, score, total, pct, details, openAnswers, now }) {
+export function generateWorkshopPDF({ student, score, total, pct, details, openAnswers, gameResults, now }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210, PL = 18, PR = 192, LH = 7
   let y = 0
@@ -45,6 +45,21 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
   const verdict = pct >= 90 ? 'Outstanding!' : pct >= 70 ? 'Good job!' : pct >= 50 ? 'Keep studying!' : 'Needs improvement'
   doc.text(verdict, W / 2, y + 17, { align: 'center' })
   y += 30
+
+  // ── Game Results (if present) ──
+  if (gameResults?.length) {
+    sectionTitle('GAMES SCORE', [26, 58, 107])
+    gameResults.forEach(g => {
+      checkY(12)
+      const ok = g.correct === g.total
+      doc.setFillColor(ok ? 234 : 248, ok ? 250 : 248, ok ? 241 : 240)
+      doc.roundedRect(PL, y, PR-PL, 10, 2, 2, 'F')
+      doc.setTextColor(30,30,60); doc.setFontSize(9); doc.setFont('helvetica','bold')
+      doc.text(`${g.label}: ${g.correct}/${g.total}`, PL+4, y+6.5)
+      y += 12
+    })
+    y += 4
+  }
 
   // ── Section title helper ──
   const sectionTitle = (title, color = [26, 58, 107]) => {
