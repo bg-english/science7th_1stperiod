@@ -46,6 +46,16 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
   doc.text(verdict, W / 2, y + 17, { align: 'center' })
   y += 30
 
+  // ── Section title helper ──
+  const sectionTitle = (title, sectionColor = [26, 58, 107]) => {
+    checkY(14)
+    doc.setFillColor(...sectionColor)
+    doc.rect(PL, y, PR - PL, 8, 'F')
+    doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold')
+    doc.text(title, PL + 3, y + 5.5)
+    y += 11; doc.setTextColor(30, 30, 60)
+  }
+
   // ── Game Results (if present) ──
   if (gameResults?.length) {
     sectionTitle('GAMES SCORE', [26,58,107])
@@ -59,16 +69,6 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
       y += 12
     })
     y += 4
-  }
-
-  // ── Section title helper ──
-  const sectionTitle = (title, sectionColor = [26, 58, 107]) => {
-    checkY(14)
-    doc.setFillColor(...sectionColor)
-    doc.rect(PL, y, PR - PL, 8, 'F')
-    doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold')
-    doc.text(title, PL + 3, y + 5.5)
-    y += 11; doc.setTextColor(30, 30, 60)
   }
 
   // ── MC/TF Results ──

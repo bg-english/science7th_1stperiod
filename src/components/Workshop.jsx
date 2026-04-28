@@ -77,67 +77,73 @@ Do you still want to submit?`
 
     setLoading(true); setStatus('Grading your workshop...')
 
-    // Grade MC/TF
-    let mcCorrect = 0
-    const details = mcTf.map(q => {
-      const given = answers[q.id]
-      const givenLabel = q.type === 'tf' ? (given ? 'TRUE' : 'FALSE') : q.options?.[given] ?? String(given)
-      const correctLabel = q.type === 'tf' ? (q.correct ? 'TRUE' : 'FALSE') : q.options?.[q.correct] ?? String(q.correct)
-      const ok = given === q.correct
-      if (ok) mcCorrect++
-      return { id: q.id, ok, given: givenLabel, correct: correctLabel }
-    })
+    try {
+      // Grade MC/TF
+      let mcCorrect = 0
+      const details = mcTf.map(q => {
+        const given = answers[q.id]
+        const givenLabel = q.type === 'tf' ? (given ? 'TRUE' : 'FALSE') : q.options?.[given] ?? String(given)
+        const correctLabel = q.type === 'tf' ? (q.correct ? 'TRUE' : 'FALSE') : q.options?.[q.correct] ?? String(q.correct)
+        const ok = given === q.correct
+        if (ok) mcCorrect++
+        return { id: q.id, ok, given: givenLabel, correct: correctLabel }
+      })
 
-    const gameTotal   = matchScore.current.total + wsScore.current.total + cwScore.current.total
-    const gameCorrect = matchScore.current.correct + wsScore.current.correct + cwScore.current.correct
+      const gameTotal   = matchScore.current.total + wsScore.current.total + cwScore.current.total
+      const gameCorrect = matchScore.current.correct + wsScore.current.correct + cwScore.current.correct
 
-    // Total = 6 MC/TF + 6 match + ws words + cw cells + 2 open (partial credit not auto-graded)
-    const autoTotal   = mcTf.length + gameTotal
-    const autoCorrect = mcCorrect + gameCorrect
-    const pct = Math.round((autoCorrect / autoTotal) * 100)
-    const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '📚' : '💪'
-    const now = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })
+      // Total = 6 MC/TF + 6 match + ws words + cw cells + 2 open (partial credit not auto-graded)
+      const autoTotal   = mcTf.length + (gameTotal || 0)
+      const autoCorrect = mcCorrect + gameCorrect
+      const pct = autoTotal > 0 ? Math.round((autoCorrect / autoTotal) * 100) : 0
+      const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '📚' : '💪'
+      const now = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })
 
-    setStatus('Generating PDF...')
+      setStatus('Generating PDF...')
 
-    const openAnswers = open.map((q, i) => ({
-      label: `Q${mcTf.length + i + 1} — ${q.section}:`,
-      instruction: q.text,
-      answer: answers[q.id] || '',
-    }))
+      const openAnswers = open.map((q, i) => ({
+        label: `Q${mcTf.length + i + 1} — ${q.section}:`,
+        instruction: q.text,
+        answer: answers[q.id] || '',
+      }))
 
-    const gameResults = [
-      { label: 'Match Game',   correct: matchScore.current.correct, total: matchScore.current.total },
-      { label: 'Word Search',  correct: wsScore.current.correct,    total: wsScore.current.total },
-      { label: 'Crossword',    correct: cwScore.current.correct,    total: cwScore.current.total },
-    ]
+      const gameResults = [
+        { label: 'Match Game',   correct: matchScore.current.correct, total: matchScore.current.total },
+        { label: 'Word Search',  correct: wsScore.current.correct,    total: wsScore.current.total },
+        { label: 'Crossword',    correct: cwScore.current.correct,    total: cwScore.current.total },
+      ]
 
-    const pdfBytes = generateWorkshopPDF({
-      student, score: autoCorrect, total: autoTotal, pct,
-      details, openAnswers, gameResults, now
-    })
+      const pdfBlob = generateWorkshopPDF({
+        student, score: autoCorrect, total: autoTotal, pct,
+        details, openAnswers, gameResults, now
+      })
 
-    setStatus('Sending to Telegram...')
+      setStatus('Sending to Telegram...')
 
-    const detailText   = details.map(d => `${d.id}: ${d.ok ? '✅' : '❌'} (${d.given} → ${d.correct})`).join('\n')
-    const gameText     = gameResults.map(g => `${g.label}: ${g.correct}/${g.total}`).join('\n')
-    const q7 = answers['wq7'] || ''
-    const q8 = answers['wq8'] || ''
+      const detailText   = details.map(d => `${d.id}: ${d.ok ? '✅' : '❌'} (${d.given} → ${d.correct})`).join('\n')
+      const gameText     = gameResults.map(g => `${g.label}: ${g.correct}/${g.total}`).join('\n')
+      const q7 = answers['wq7'] || ''
+      const q8 = answers['wq8'] || ''
 
-    await sendTelegramText(
-      `📝 <b>WORKSHOP SUBMITTED — 7th Grade Science</b>\n` +
-      `👤 <b>${student.name}</b>\n📧 ${student.email}\n🕐 ${now}\n\n` +
-      `<b>📊 AUTO SCORE: ${autoCorrect}/${autoTotal} (${pct}%) ${emoji}</b>\n\n` +
-      `<b>MC/TF:</b>\n${detailText}\n\n` +
-      `<b>Games:</b>\n${gameText}\n\n` +
-      `<b>Q7:</b>\n${q7}\n\n<b>Q8:</b>\n${q8}`
-    )
+      await sendTelegramText(
+        `📝 <b>WORKSHOP SUBMITTED — 7th Grade Science</b>\n` +
+        `👤 <b>${student.name}</b>\n📧 ${student.email}\n🕐 ${now}\n\n` +
+        `<b>📊 AUTO SCORE: ${autoCorrect}/${autoTotal} (${pct}%) ${emoji}</b>\n\n` +
+        `<b>MC/TF:</b>\n${detailText}\n\n` +
+        `<b>Games:</b>\n${gameText}\n\n` +
+        `<b>Q7:</b>\n${q7}\n\n<b>Q8:</b>\n${q8}`
+      )
 
-    const fileName = `Workshop_${student.name.replace(/\s+/g, '_')}_Science7.pdf`
-    await sendTelegramDocument(pdfBytes, fileName, `📄 ${student.name} — Science Workshop ${pct}%`)
+      const fileName = `Workshop_${student.name.replace(/\s+/g, '_')}_Science7.pdf`
+      await sendTelegramDocument(pdfBlob, fileName, `📄 ${student.name} — Science Workshop ${pct}%`)
 
-    setResult({ score: autoCorrect, total: autoTotal, pct })
-    setLoading(false)
+      setResult({ score: autoCorrect, total: autoTotal, pct })
+    } catch (err) {
+      console.error('Submit error:', err)
+      setStatus('Error sending — please try again or contact your teacher.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

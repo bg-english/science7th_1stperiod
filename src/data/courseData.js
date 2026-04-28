@@ -12,6 +12,7 @@ export const COURSE_META = {
 }
 
 export const STUDENTS = [
+  { name: 'EDOARDO ORTIZ',                      email: 'edoardoortiz@gmail.com' },
   { name: 'ACEVEDO DUQUE CARLOS DAVID',         email: 'cacevedo@redboston.edu.co' },
   { name: 'AGUIRRE CONTRERAS ANDREA KAROLINA',  email: 'andreaaguirre@redboston.edu.co' },
   { name: 'BARRAGAN RENDON MILTON SANTIAGO',    email: 'mbarragan@redboston.edu.co' },
