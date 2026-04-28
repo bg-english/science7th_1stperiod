@@ -132,5 +132,5 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
     doc.text(`Page ${i} of ${pages}`, PR, 292, { align: 'right' })
   }
 
-  return new Uint8Array(doc.output('arraybuffer'))
+  return doc.output('blob')
 }
