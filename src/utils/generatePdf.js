@@ -48,23 +48,23 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
 
   // ── Game Results (if present) ──
   if (gameResults?.length) {
-    sectionTitle('GAMES SCORE', [26, 58, 107])
-    gameResults.forEach(g => {
+    sectionTitle('GAMES SCORE', [26,58,107])
+    gameResults.forEach(gameRow => {
       checkY(12)
-      const ok = g.correct === g.total
+      const ok = gameRow.correct === gameRow.total
       doc.setFillColor(ok ? 234 : 248, ok ? 250 : 248, ok ? 241 : 240)
       doc.roundedRect(PL, y, PR-PL, 10, 2, 2, 'F')
       doc.setTextColor(30,30,60); doc.setFontSize(9); doc.setFont('helvetica','bold')
-      doc.text(`${g.label}: ${g.correct}/${g.total}`, PL+4, y+6.5)
+      doc.text(`${gameRow.label}: ${gameRow.correct}/${gameRow.total}`, PL+4, y+6.5)
       y += 12
     })
     y += 4
   }
 
   // ── Section title helper ──
-  const sectionTitle = (title, color = [26, 58, 107]) => {
+  const sectionTitle = (title, sectionColor = [26, 58, 107]) => {
     checkY(14)
-    doc.setFillColor(...color)
+    doc.setFillColor(...sectionColor)
     doc.rect(PL, y, PR - PL, 8, 'F')
     doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold')
     doc.text(title, PL + 3, y + 5.5)
@@ -72,7 +72,7 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
   }
 
   // ── MC/TF Results ──
-  sectionTitle('PART 1 — Multiple Choice & True/False Results')
+  sectionTitle('PART 1 — Multiple Choice & True/False Results', [26,58,107])
 
   const qLabels = {
     wq1: 'Q1 · Ecosystems — Abiotic/Biotic pair',
@@ -101,7 +101,7 @@ export function generateWorkshopPDF({ student, score, total, pct, details, openA
   y += 4
 
   // ── Open questions ──
-  sectionTitle('PART 2 — Open Questions')
+  sectionTitle('PART 2 — Open Questions', [26,58,107])
 
   openAnswers.forEach(({ label, instruction, answer }) => {
     checkY(20)

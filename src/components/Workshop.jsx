@@ -1,4 +1,4 @@
-// components/Workshop.jsx
+// components/Workshop.jsx - v2
 import { useState, useRef } from 'react'
 import { WORKSHOP_QUESTIONS, WORKSHOP_MATCH, WORKSHOP_WORDSEARCH, WORKSHOP_CROSSWORD } from '../data/courseData'
 import { sendTelegramText, sendTelegramDocument } from '../utils/telegram'
