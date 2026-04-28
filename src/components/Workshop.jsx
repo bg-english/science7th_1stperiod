@@ -78,13 +78,13 @@ Do you still want to submit?`
     setLoading(true); setStatus('Grading your workshop...')
 
     // Grade MC/TF
-    let mcScore = 0
+    let mcCorrect = 0
     const details = mcTf.map(q => {
       const given = answers[q.id]
       const givenLabel = q.type === 'tf' ? (given ? 'TRUE' : 'FALSE') : q.options?.[given] ?? String(given)
       const correctLabel = q.type === 'tf' ? (q.correct ? 'TRUE' : 'FALSE') : q.options?.[q.correct] ?? String(q.correct)
       const ok = given === q.correct
-      if (ok) mcScore++
+      if (ok) mcCorrect++
       return { id: q.id, ok, given: givenLabel, correct: correctLabel }
     })
 
@@ -93,7 +93,7 @@ Do you still want to submit?`
 
     // Total = 6 MC/TF + 6 match + ws words + cw cells + 2 open (partial credit not auto-graded)
     const autoTotal   = mcTf.length + gameTotal
-    const autoCorrect = mcScore + gameCorrect
+    const autoCorrect = mcCorrect + gameCorrect
     const pct = Math.round((autoCorrect / autoTotal) * 100)
     const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '📚' : '💪'
     const now = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })
