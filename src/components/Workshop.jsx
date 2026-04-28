@@ -171,109 +171,99 @@ Do you still want to submit?`
       </div>
 
       {/* ── Q&A ── */}
-      {section === 'mc' && (
-        <>
-          {mcTf.map((q, idx) => (
-            <div key={q.id} className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-              <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: '#c0392b' }}>
-                Q{idx+1} · {q.type === 'tf' ? 'True / False' : 'Multiple Choice'} · {q.section}
-              </p>
-              <p className="font-bold text-sm mb-4 leading-snug">{q.text}</p>
-              {q.type === 'mc' ? (
-                <div className="space-y-2">
-                  {q.options.map((opt, i) => (
-                    <div key={i} onClick={() => selectOption(q.id, i)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all text-sm font-semibold"
-                      style={{
-                        borderColor: answers[q.id] === i ? '#1a3a6b' : '#e5e7eb',
-                        background:  answers[q.id] === i ? '#dde8f7' : 'white',
-                      }}>
-                      <input type="radio" readOnly checked={answers[q.id] === i}
-                        className="w-4 h-4 flex-shrink-0" style={{ accentColor: '#1a3a6b' }} />
-                      <label className="cursor-pointer">{opt}</label>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex gap-3">
-                  {[true, false].map(val => (
-                    <button key={String(val)} onClick={() => selectOption(q.id, val)}
-                      className="flex-1 py-3 rounded-xl border-2 font-black text-sm transition-all"
-                      style={{
-                        borderColor: answers[q.id] === val ? '#1a3a6b' : '#e5e7eb',
-                        background:  answers[q.id] === val ? '#dde8f7' : 'white',
-                        color:       answers[q.id] === val ? '#1a3a6b' : '#6b7280',
-                      }}>
-                      {val ? 'TRUE' : 'FALSE'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </>
-      )}
+      <div style={{ display: section === 'mc' ? '' : 'none' }}>
+        {mcTf.map((q, idx) => (
+          <div key={q.id} className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: '#c0392b' }}>
+              Q{idx+1} · {q.type === 'tf' ? 'True / False' : 'Multiple Choice'} · {q.section}
+            </p>
+            <p className="font-bold text-sm mb-4 leading-snug">{q.text}</p>
+            {q.type === 'mc' ? (
+              <div className="space-y-2">
+                {q.options.map((opt, i) => (
+                  <div key={i} onClick={() => selectOption(q.id, i)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all text-sm font-semibold"
+                    style={{
+                      borderColor: answers[q.id] === i ? '#1a3a6b' : '#e5e7eb',
+                      background:  answers[q.id] === i ? '#dde8f7' : 'white',
+                    }}>
+                    <input type="radio" readOnly checked={answers[q.id] === i}
+                      className="w-4 h-4 flex-shrink-0" style={{ accentColor: '#1a3a6b' }} />
+                    <label className="cursor-pointer">{opt}</label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                {[true, false].map(val => (
+                  <button key={String(val)} onClick={() => selectOption(q.id, val)}
+                    className="flex-1 py-3 rounded-xl border-2 font-black text-sm transition-all"
+                    style={{
+                      borderColor: answers[q.id] === val ? '#1a3a6b' : '#e5e7eb',
+                      background:  answers[q.id] === val ? '#dde8f7' : 'white',
+                      color:       answers[q.id] === val ? '#1a3a6b' : '#6b7280',
+                    }}>
+                    {val ? 'TRUE' : 'FALSE'}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* ── Match ── */}
-      {section === 'match' && (
-        <>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
-            ⭐ This activity is graded! Match all pairs correctly to earn full points.
-          </div>
-          <MatchGame
-            pairs={WORKSHOP_MATCH}
-            onScore={(correct, total) => { matchScore.current = { correct, total } }}
-          />
-        </>
-      )}
+      <div style={{ display: section === 'match' ? '' : 'none' }}>
+        <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
+          ⭐ This activity is graded! Match all pairs correctly to earn full points.
+        </div>
+        <MatchGame
+          pairs={WORKSHOP_MATCH}
+          onScore={(correct, total) => { matchScore.current = { correct, total } }}
+        />
+      </div>
 
       {/* ── Word Search ── */}
-      {section === 'wordsearch' && (
-        <>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
-            ⭐ This activity is graded! Find all words to earn full points.
-          </div>
-          <WordSearch
-            words={WORKSHOP_WORDSEARCH}
-            onScore={(correct, total) => { wsScore.current = { correct, total } }}
-          />
-        </>
-      )}
+      <div style={{ display: section === 'wordsearch' ? '' : 'none' }}>
+        <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
+          ⭐ This activity is graded! Find all words to earn full points.
+        </div>
+        <WordSearch
+          words={WORKSHOP_WORDSEARCH}
+          onScore={(correct, total) => { wsScore.current = { correct, total } }}
+        />
+      </div>
 
       {/* ── Crossword ── */}
-      {section === 'crossword' && (
-        <>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
-            ⭐ This activity is graded! Press "Check Answers" when done.
-          </div>
-          <Crossword
-            clues={WORKSHOP_CROSSWORD}
-            onScore={(correct, total) => { cwScore.current = { correct, total } }}
-          />
-        </>
-      )}
+      <div style={{ display: section === 'crossword' ? '' : 'none' }}>
+        <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 mb-4 text-xs font-bold text-orange-700">
+          ⭐ This activity is graded! Press "Check Answers" when done.
+        </div>
+        <Crossword
+          clues={WORKSHOP_CROSSWORD}
+          onScore={(correct, total) => { cwScore.current = { correct, total } }}
+        />
+      </div>
 
       {/* ── Open Questions ── */}
-      {section === 'open' && (
-        <>
-          {open.map((q, idx) => (
-            <div key={q.id} className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-              <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: '#c0392b' }}>
-                Q{mcTf.length + idx + 1} · Open · {q.section}
-              </p>
-              <p className="font-bold text-sm mb-3 leading-snug">{q.text}</p>
-              <textarea rows={4} placeholder={q.placeholder}
-                value={answers[q.id] || ''}
-                onChange={e => setOpen(q.id, e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm leading-relaxed resize-y focus:outline-none transition-colors"
-                style={{ fontFamily: 'Nunito,sans-serif', minHeight:'90px' }}
-                onFocus={e => e.target.style.borderColor = '#1a3a6b'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
-          ))}
-        </>
-      )}
+      <div style={{ display: section === 'open' ? '' : 'none' }}>
+        {open.map((q, idx) => (
+          <div key={q.id} className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: '#c0392b' }}>
+              Q{mcTf.length + idx + 1} · Open · {q.section}
+            </p>
+            <p className="font-bold text-sm mb-3 leading-snug">{q.text}</p>
+            <textarea rows={4} placeholder={q.placeholder}
+              value={answers[q.id] || ''}
+              onChange={e => setOpen(q.id, e.target.value)}
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm leading-relaxed resize-y focus:outline-none transition-colors"
+              style={{ fontFamily: 'Nunito,sans-serif', minHeight:'90px' }}
+              onFocus={e => e.target.style.borderColor = '#1a3a6b'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+            />
+          </div>
+        ))}
+      </div>
 
       {/* Submit */}
       <div className="text-center pt-4 pb-10">
